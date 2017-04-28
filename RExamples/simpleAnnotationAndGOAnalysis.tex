@@ -1,0 +1,587 @@
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{underscore}
+\usepackage[utf8]{inputenc}
+\usepackage{longtable}
+\usepackage[margin=1in]{geometry}
+%\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\title{A quick gene selection, annotation and GO analysis}
+\author{Alex S\'anchez$\sp {1,2}$}
+\date{$\sp 1$Statistics and Bioinformatics Unit (VHIR)\\
+ $\sp 2$ Statistics Department. University of Barcelona}
+
+\maketitle
+
+\tableofcontents
+
+
+
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwa{if}\hlstd{(}\hlopt{!}\hlstd{(}\hlkwd{require}\hlstd{(printr))) \{}
+  \hlkwd{install.packages}\hlstd{(}
+    \hlstr{'printr'}\hlstd{,}
+    \hlkwc{type} \hlstd{=} \hlstr{'source'}\hlstd{,}
+    \hlkwc{repos} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'http://yihui.name/xran'}\hlstd{,} \hlstr{'http://cran.rstudio.com'}\hlstd{)}
+  \hlstd{)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+\section{Introduction}
+
+Most gene expression studies undergo one phase where, after gene
+selection has been performed, one wishes to:
+\begin{enumerate}
+\item Annotate the genes or transcripts, that is associate, to each
+  probeset or transcript, some identifiers in the appropriate
+  databases that can be used to understand better the results or that
+  are needed to proceed with further analyses (for instance GO
+  Analysis needs ``Entrez'' identifiers).
+\item Do some type of Gene Set Enrichment Analyses such as
+  Overrepresentation Analysis (ORA) or classical Gene Set Enrichment
+  Analysis (GSEA).
+\end{enumerate}
+
+This document is an illustration which does not intend to be exhaustive, on how to do this with some of these packages.
+
+\subsection{Obtaining gene lists}
+
+The first step in annotation analysis is to obtain the gene lists,
+usually as the output of some differential expression analysis.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{topTab} \hlkwb{<-} \hlkwd{read.table}\hlstd{(}\hlstr{"https://raw.githubusercontent.com/alexsanchezpla/scripts/master/Exemple_Analisis_BioC/results/ExpressAndTop_AvsB.csv2"}\hlstd{,} \hlkwc{head}\hlstd{=}\hlnum{TRUE}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{";"}\hlstd{,} \hlkwc{dec}\hlstd{=}\hlstr{","}\hlstd{,} \hlkwc{row.names} \hlstd{=} \hlnum{1}\hlstd{)}
+\hlkwd{colnames}\hlstd{(topTab)}
+\end{alltt}
+\begin{verbatim}
+##  [1] "SymbolsA"  "EntrezsA"  "logFC"     "AveExpr"   "t"         "P.Value"  
+##  [7] "adj.P.Val" "B"         "A.PF14"    "A.PF19"    "A.PF23"    "A.PF39"   
+## [13] "A.PF46"    "B.PF24"    "B.PF25"    "B.PF28"    "B.PF34"    "B.PF42"
+\end{verbatim}
+\begin{alltt}
+\hlkwd{head}\hlstd{(topTab)}
+\end{alltt}
+\end{kframe}
+
+
+\begin{tabular}{l|l|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r}
+\hline
+  & SymbolsA & EntrezsA & logFC & AveExpr & t & P.Value & adj.P.Val & B & A.PF14 & A.PF19 & A.PF23 & A.PF39 & A.PF46 & B.PF24 & B.PF25 & B.PF28 & B.PF34 & B.PF42\\
+\hline
+204667\_at & FOXA1 & 3169 & -3.038 & 8.651 & -14.362 & 0 & 0 & 14.649 & 9.822 & 9.514 & 9.919 & 9.601 & 9.592 & 6.484 & 6.551 & 7.001 & 6.685 & 6.535\\
+\hline
+215729\_s\_at & VGLL1 & 51442 & 3.452 & 6.138 & 12.815 & 0 & 0 & 13.149 & 4.737 & 4.761 & 6.255 & 4.820 & 4.848 & 8.266 & 8.963 & 8.304 & 8.769 & 8.381\\
+\hline
+220192\_x\_at & SPDEF & 25803 & -3.016 & 9.522 & -10.859 & 0 & 0 & 10.928 & 10.484 & 10.915 & 10.511 & 11.510 & 10.265 & 7.824 & 7.810 & 7.522 & 8.427 & 7.020\\
+\hline
+214451\_at & TFAP2B & 7021 & -5.665 & 7.433 & -10.829 & 0 & 0 & 10.892 & 10.177 & 10.060 & 11.201 & 10.889 & 10.404 & 4.818 & 4.784 & 4.976 & 4.912 & 4.916\\
+\hline
+217528\_at & CLCA2 & 9635 & -5.622 & 6.763 & -9.666 & 0 & 0 & 9.363 & 10.534 & 10.036 & 11.326 & 8.053 & 10.619 & 4.581 & 4.538 & 4.519 & 4.357 & 4.463\\
+\hline
+217284\_x\_at & SERHL2 & 253190 & -4.313 & 9.133 & -9.528 & 0 & 0 & 9.171 & 11.727 & 9.741 & 11.436 & 12.819 & 12.687 & 7.274 & 7.298 & 7.490 & 7.562 & 7.218\\
+\hline
+\end{tabular}
+\end{knitrout}
+
+\section{Annotating the genes}
+
+This table has already been ``annotated'' in the script that has
+performed the original analysis, but, \emph{what would we have had to do if
+it hadn't been}?
+
+We might have used either a specific annotation package for the array
+or the BioMaRt package.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{atVHIR} \hlkwb{<-} \hlnum{TRUE}
+\hlkwa{if} \hlstd{(atVHIR)\{}
+    \hlstd{http_proxy}\hlkwb{=}\hlstr{"http://conf_www.ir.vhebron.net:8080/"}
+    \hlstd{https_proxy}\hlkwb{=}\hlstr{"http://conf_www.ir.vhebron.net:8080/"}
+    \hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Using a microarray annotation package}
+
+If we hadn't had 'Entrez' Identifiers, but only the probeset identifiers which depend on the array type we might have done as follows:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{probeIDsAll} \hlkwb{<-} \hlkwd{rownames}\hlstd{(topTab)}
+\hlstd{probeIDsUp} \hlkwb{<-} \hlstd{probeIDsAll [topTab}\hlopt{$}\hlstd{adj.P.Val}\hlopt{<}\hlnum{0.05} \hlopt{&} \hlstd{topTab}\hlopt{$}\hlstd{logFC} \hlopt{>} \hlnum{0}\hlstd{]}
+\hlstd{probeIDsDown} \hlkwb{<-} \hlstd{probeIDsAll [topTab}\hlopt{$}\hlstd{adj.P.Val}\hlopt{<}\hlnum{0.05} \hlopt{&} \hlstd{topTab}\hlopt{$}\hlstd{logFC} \hlopt{<} \hlnum{0}\hlstd{]}
+
+\hlkwd{require}\hlstd{(hgu133a.db)}
+\hlkwd{keytypes}\hlstd{(hgu133a.db)}
+\end{alltt}
+\begin{verbatim}
+##  [1] "ACCNUM"       "ALIAS"        "ENSEMBL"      "ENSEMBLPROT"  "ENSEMBLTRANS"
+##  [6] "ENTREZID"     "ENZYME"       "EVIDENCE"     "EVIDENCEALL"  "GENENAME"    
+## [11] "GO"           "GOALL"        "IPI"          "MAP"          "OMIM"        
+## [16] "ONTOLOGY"     "ONTOLOGYALL"  "PATH"         "PFAM"         "PMID"        
+## [21] "PROBEID"      "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"      
+## [26] "UNIGENE"      "UNIPROT"
+\end{verbatim}
+\begin{alltt}
+\hlstd{geneEntrezsUp} \hlkwb{<-} \hlkwd{select}\hlstd{(hgu133a.db,} \hlkwc{keys} \hlstd{= probeIDsUp,} \hlkwc{columns}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"ENTREZID"}\hlstd{,} \hlstr{"SYMBOL"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# 'select()' returned 1:1 mapping between keys and columns}}\begin{alltt}
+\hlstd{geneEntrezsDown} \hlkwb{<-} \hlkwd{select}\hlstd{(hgu133a.db,} \hlkwc{keys} \hlstd{= probeIDsUp,} \hlkwc{columns}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"ENTREZID"}\hlstd{,} \hlstr{"SYMBOL"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# 'select()' returned 1:1 mapping between keys and columns}}\begin{alltt}
+\hlstd{geneEntrezsUniverse} \hlkwb{<-} \hlkwd{select}\hlstd{(hgu133a.db,} \hlkwc{keys} \hlstd{= probeIDsAll,} \hlkwc{columns}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"ENTREZID"}\hlstd{,} \hlstr{"SYMBOL"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# 'select()' returned 1:1 mapping between keys and columns}}\begin{alltt}
+\hlkwd{head}\hlstd{(geneEntrezsUp)}
+\end{alltt}
+\end{kframe}
+
+
+\begin{tabular}{l|l|l}
+\hline
+PROBEID & ENTREZID & SYMBOL\\
+\hline
+215729\_s\_at & 51442 & VGLL1\\
+\hline
+205044\_at & 2568 & GABRP\\
+\hline
+209337\_at & 11168 & PSIP1\\
+\hline
+209786\_at & 10473 & HMGN4\\
+\hline
+204061\_at & 5613 & PRKX\\
+\hline
+207039\_at & 1029 & CDKN2A\\
+\hline
+\end{tabular}
+\end{knitrout}
+
+\subsection{Using BiomaRt}
+
+Biomart is a powerful engine for linking identifiers.
+It is a bit cryptic at the first approach because in order to use it we must define \emph{filters} (what we input for searching), \emph{attributes} (what we output) and \emph{values} (which values we input).
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{biodataset} \hlkwb{<-} \hlkwd{useDataset}\hlstd{(}\hlstr{"hsapiens_gene_ensembl"}\hlstd{,} \hlkwd{useMart}\hlstd{(}\hlstr{"ensembl"}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## Request to BioMart web service failed. Verify if you are still connected to the internet.  Alternatively the BioMart web service is temporarily down.  Check http://www.biomart.org and verify if this website is available.
+\end{verbatim}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: XML content does not seem to be XML:}}\begin{alltt}
+\hlkwd{listDatasets}\hlstd{(biodataset)}\hlopt{$}\hlstd{dataset}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is(mart, "{}Mart"{}): object 'biodataset' not found}}\begin{alltt}
+\hlstd{filters}\hlkwb{<-}\hlkwd{listFilters}\hlstd{(biodataset)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in martCheck(mart): object 'biodataset' not found}}\begin{alltt}
+\hlcom{# We need to find the filter to link with Affymetrx arrays hgu133a}
+\hlstd{u133aFilters}\hlkwb{<-} \hlkwd{grep}\hlstd{(}\hlstr{"u133a"}\hlstd{, filters[,}\hlnum{1}\hlstd{] )}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in grep("{}u133a"{}, filters[, 1]): object 'filters' not found}}\begin{alltt}
+\hlstd{u133aFilters} \hlkwb{<-} \hlstd{filters[u133aFilters,]}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'filters' not found}}\begin{alltt}
+\hlstd{myu133aFilter} \hlkwb{<-} \hlstd{u133aFilters[}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{]}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'u133aFilters' not found}}\begin{alltt}
+\hlstd{myu133aFilter}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'myu133aFilter' not found}}\begin{alltt}
+\hlstd{atributs}\hlkwb{<-} \hlkwd{listAttributes}\hlstd{(biodataset)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in martCheck(mart): object 'biodataset' not found}}\begin{alltt}
+\hlstd{entrezAtributs}\hlkwb{<-} \hlkwd{grep}\hlstd{(}\hlstr{"entrez"}\hlstd{, atributs[,}\hlnum{1}\hlstd{])}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in grep("{}entrez"{}, atributs[, 1]): object 'atributs' not found}}\begin{alltt}
+\hlstd{entrezAtribut} \hlkwb{<-} \hlstd{atributs[entrezAtributs,]}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'atributs' not found}}\begin{alltt}
+\hlstd{myentrezAtribut} \hlkwb{<-} \hlstd{entrezAtribut[}\hlnum{2}\hlstd{,}\hlnum{1}\hlstd{]}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'entrezAtribut' not found}}\begin{alltt}
+\hlstd{myentrezAtribut}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'myentrezAtribut' not found}}\begin{alltt}
+\hlcom{# Now we can do the search}
+\hlstd{entrezfromProbesUp} \hlkwb{<-} \hlkwd{getBM}\hlstd{(}\hlkwc{filters}\hlstd{= myu133aFilter,}
+                          \hlkwc{attributes}\hlstd{=} \hlkwd{c}\hlstd{(myentrezAtribut, myu133aFilter),}
+                          \hlkwc{values}\hlstd{= probeIDsUp,}
+                          \hlkwc{mart}\hlstd{= biodataset,}\hlkwc{uniqueRows}\hlstd{=}\hlnum{TRUE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in martCheck(mart): object 'biodataset' not found}}\begin{alltt}
+\hlkwd{head}\hlstd{(entrezfromProbesUp)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in head(entrezfromProbesUp): object 'entrezfromProbesUp' not found}}\end{kframe}
+\end{knitrout}
+
+\subsection{The gene list for pathway Analysis}
+
+In this example we had already had the Entrez and Symbol identifiers so we can extract these directly from the topTable.
+
+Although we skip it here it may be interesting to compare the entrez identifiers obtained from the three distinct approaches. They should be identical, but there may be small discrepancies...
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{geneListUp} \hlkwb{<-} \hlstd{topTab}\hlopt{$}\hlstd{EntrezsA [topTab}\hlopt{$}\hlstd{adj.P.Val}\hlopt{<}\hlnum{0.05} \hlopt{&} \hlstd{topTab}\hlopt{$}\hlstd{logFC} \hlopt{>} \hlnum{0}\hlstd{]}
+\hlkwd{head}\hlstd{(geneListUp)}
+\end{alltt}
+\begin{verbatim}
+## [1] 51442  2568 11168 10473  5613  1029
+\end{verbatim}
+\begin{alltt}
+\hlstd{geneListDown} \hlkwb{<-} \hlstd{topTab}\hlopt{$}\hlstd{EntrezsA [topTab}\hlopt{$}\hlstd{adj.P.Val}\hlopt{<}\hlnum{0.05} \hlopt{&} \hlstd{topTab}\hlopt{$}\hlstd{logFC} \hlopt{<} \hlnum{0}\hlstd{]}
+\hlkwd{length}\hlstd{(geneListDown)}
+\end{alltt}
+\begin{verbatim}
+## [1] 268
+\end{verbatim}
+\begin{alltt}
+\hlstd{geneUniverse} \hlkwb{<-} \hlstd{topTab}\hlopt{$}\hlstd{EntrezsA}
+\hlkwd{length}\hlstd{(geneUniverse)}
+\end{alltt}
+\begin{verbatim}
+## [1] 6221
+\end{verbatim}
+\begin{alltt}
+\hlstd{writeGeneLists}\hlkwb{<-} \hlnum{FALSE}
+\hlkwa{if}\hlstd{(writeGeneLists)\{}
+  \hlkwd{write.csv}\hlstd{(geneListUp,} \hlkwc{file}\hlstd{=}\hlstr{"selectedAvsB.up.csv"}\hlstd{)}
+  \hlkwd{write.csv}\hlstd{(geneListDown,} \hlkwc{file}\hlstd{=}\hlstr{"selectedAvsB.down.csv"}\hlstd{)}
+  \hlkwd{write.csv}\hlstd{(geneUniverse,} \hlkwc{file}\hlstd{=}\hlstr{"geneUniverse.csv"}\hlstd{)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section{Pathway Analysis}
+
+We start by removing NA's (if any) and ensuring that we have unique identifiers.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Remove potential NA's values}
+\hlstd{geneEntrezsUp} \hlkwb{<-} \hlkwd{unique}\hlstd{(geneListUp[}\hlopt{!}\hlkwd{is.na}\hlstd{(geneListUp)])}
+\hlstd{geneEntrezsDown} \hlkwb{<-} \hlkwd{unique}\hlstd{(geneListDown[}\hlopt{!}\hlkwd{is.na}\hlstd{(geneListDown)])}
+\hlstd{geneEntrezsUniverse} \hlkwb{<-} \hlkwd{unique}\hlstd{(geneUniverse[}\hlopt{!}\hlkwd{is.na}\hlstd{(geneUniverse)])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+We will use the \texttt{GOstats package} which proceeds in two steps:
+\begin{enumerate}
+  \item First we create the appropriate objects
+  \item Next we use them to do the enrichment analysis
+  \item In a final step we generate an html report with the test results
+\end{enumerate}
+
+First we create the appropriate objects
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{require}\hlstd{(GOstats)}
+\hlcom{## Creamos los "hiperparametros" en que se basa el analisis}
+\hlstd{GOparams} \hlkwb{=} \hlkwd{new}\hlstd{(}\hlstr{"GOHyperGParams"}\hlstd{,}
+               \hlkwc{geneIds}\hlstd{=geneEntrezsUp,} \hlkwc{universeGeneIds}\hlstd{=geneEntrezsUniverse,}
+               \hlkwc{annotation}\hlstd{=}\hlstr{"org.Hs.eg.db"}\hlstd{,} \hlcom{# might have use hgu133a.db instead}
+               \hlkwc{ontology}\hlstd{=}\hlstr{"BP"}\hlstd{,}
+               \hlkwc{pvalueCutoff}\hlstd{=}\hlnum{0.001}\hlstd{,} \hlkwc{conditional}\hlstd{=}\hlnum{FALSE}\hlstd{,}
+               \hlkwc{testDirection}\hlstd{=}\hlstr{"over"}\hlstd{)}
+\hlstd{KEGGparams} \hlkwb{=} \hlkwd{new}\hlstd{(}\hlstr{"KEGGHyperGParams"}\hlstd{,}
+                 \hlkwc{geneIds}\hlstd{=geneEntrezsUp,} \hlkwc{universeGeneIds}\hlstd{=geneEntrezsUniverse,}
+                 \hlkwc{annotation}\hlstd{=}\hlstr{"org.Hs.eg.db"}\hlstd{,} \hlcom{# might have use hgu133a.db instead}
+                 \hlkwc{pvalueCutoff}\hlstd{=}\hlnum{0.01}\hlstd{,} \hlkwc{testDirection}\hlstd{=}\hlstr{"over"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Next we use them to do the enrichment analysis
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{GOhyper} \hlkwb{=} \hlkwd{hyperGTest}\hlstd{(GOparams)}
+\hlstd{KEGGhyper} \hlkwb{=} \hlkwd{hyperGTest}\hlstd{(KEGGparams)}
+\hlkwd{cat}\hlstd{(}\hlstr{"GO\textbackslash{}n"}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## GO
+\end{verbatim}
+\begin{alltt}
+\hlkwd{print}\hlstd{(}\hlkwd{head}\hlstd{(}\hlkwd{summary}\hlstd{(GOhyper)))}
+\end{alltt}
+\begin{verbatim}
+##       GOBPID       Pvalue OddsRatio ExpCount Count Size
+## 1 GO:0000278 0.0000008665     2.209    30.65    58  524
+## 2 GO:0007049 0.0000038238     1.897    48.67    79  832
+## 3 GO:0007067 0.0000080651     2.720    12.75    30  218
+## 4 GO:0000280 0.0000126635     2.518    15.03    33  257
+## 5 GO:0051301 0.0000413601     2.354    15.91    33  272
+## 6 GO:0008283 0.0000438041     1.741    52.77    80  902
+##                       Term
+## 1       mitotic cell cycle
+## 2               cell cycle
+## 3 mitotic nuclear division
+## 4         nuclear division
+## 5            cell division
+## 6       cell proliferation
+\end{verbatim}
+\begin{alltt}
+\hlkwd{cat}\hlstd{(}\hlstr{"KEGG\textbackslash{}n"}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## KEGG
+\end{verbatim}
+\begin{alltt}
+\hlkwd{print}\hlstd{(}\hlkwd{head}\hlstd{(}\hlkwd{summary}\hlstd{(KEGGhyper)))}
+\end{alltt}
+\begin{verbatim}
+##   KEGGID   Pvalue OddsRatio ExpCount Count Size
+## 1  04110 0.001294     2.878    5.724    14   89
+## 2  04114 0.002082     3.167    4.116    11   64
+## 3  04914 0.002461     3.590    3.023     9   47
+## 4  04010 0.004909     2.352    7.267    15  113
+## 5  04062 0.006140     2.452    6.045    13   94
+## 6  04971 0.007421     4.082    1.801     6   28
+##                                      Term
+## 1                              Cell cycle
+## 2                          Oocyte meiosis
+## 3 Progesterone-mediated oocyte maturation
+## 4                  MAPK signaling pathway
+## 5             Chemokine signaling pathway
+## 6                  Gastric acid secretion
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+In a final step we generate an html report with the test results
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Creamos un informe html con los resultados}
+\hlstd{GOfilename} \hlkwb{=}\hlkwd{file.path}\hlstd{(}\hlkwd{paste}\hlstd{(}\hlstr{"GOResults.AvsB.up"}\hlstd{,}\hlstr{".html"}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{""}\hlstd{))}
+\hlstd{KEGGfilename} \hlkwb{=}\hlkwd{file.path}\hlstd{(}\hlkwd{paste}\hlstd{(}\hlstr{"KEGGResults.AvsB.up"}\hlstd{,}\hlstr{".html"}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{""}\hlstd{))}
+\hlkwd{htmlReport}\hlstd{(GOhyper,} \hlkwc{file} \hlstd{= GOfilename,} \hlkwc{summary.args}\hlstd{=}\hlkwd{list}\hlstd{(}\hlstr{"htmlLinks"}\hlstd{=}\hlnum{TRUE}\hlstd{))}
+\hlkwd{htmlReport}\hlstd{(KEGGhyper,} \hlkwc{file} \hlstd{= KEGGfilename,} \hlkwc{summary.args}\hlstd{=}\hlkwd{list}\hlstd{(}\hlstr{"htmlLinks"}\hlstd{=}\hlnum{TRUE}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section{Analysis of Functional Profiles}
+
+The \texttt{goProfiles} package provides a different approach to Pathway Analysis. Its most distinctive characteristic is the possibility of projecting gene lists on ``levels" of the Gene Ontology and compare these projections between lists (compare lists based on their projections).
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{require}\hlstd{(goProfiles)}
+\hlstd{BPprofile1}\hlkwb{<-} \hlkwd{basicProfile}\hlstd{(}\hlkwc{genelist}\hlstd{=geneListUp,} \hlkwc{onto}\hlstd{=}\hlstr{"BP"}\hlstd{,} \hlkwc{orgPackage}\hlstd{=}\hlstr{"org.Hs.eg.db"}\hlstd{,} \hlkwc{empty.cats}\hlstd{=}\hlnum{FALSE}\hlstd{,} \hlkwc{level}\hlstd{=}\hlnum{2}\hlstd{)[[}\hlnum{1}\hlstd{]]}
+\hlkwd{head}\hlstd{(BPprofile1)}
+\end{alltt}
+\end{kframe}
+
+
+\begin{tabular}{l|l|l|r}
+\hline
+  & Description & GOID & Frequency\\
+\hline
+6 & behavior & GO:0007610 & 11\\
+\hline
+9 & biological adhesion & GO:0022610 & 44\\
+\hline
+15 & biological phase & GO:0044848 & 1\\
+\hline
+23 & biological regulation & GO:0065007 & 265\\
+\hline
+3 & cell killing & GO:0001906 & 6\\
+\hline
+24 & cellular component organization or biogenesis & GO:0071840 & 165\\
+\hline
+\end{tabular}
+\end{knitrout}
+
+Now we might want to annotate the GO categories with their genes.
+First we look the reverse, which GO terms are associated with each gene in the list
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{require}\hlstd{(org.Hs.eg.db)}
+\hlkwd{keytypes}\hlstd{(org.Hs.eg.db)}
+\end{alltt}
+\begin{verbatim}
+##  [1] "ACCNUM"       "ALIAS"        "ENSEMBL"      "ENSEMBLPROT"  "ENSEMBLTRANS"
+##  [6] "ENTREZID"     "ENZYME"       "EVIDENCE"     "EVIDENCEALL"  "GENENAME"    
+## [11] "GO"           "GOALL"        "IPI"          "MAP"          "OMIM"        
+## [16] "ONTOLOGY"     "ONTOLOGYALL"  "PATH"         "PFAM"         "PMID"        
+## [21] "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"       "UNIGENE"     
+## [26] "UNIPROT"
+\end{verbatim}
+\begin{alltt}
+\hlstd{entrezsUp2GO} \hlkwb{<-} \hlkwd{select}\hlstd{(org.Hs.eg.db,} \hlkwc{keys} \hlstd{=} \hlkwd{as.character}\hlstd{(geneListUp),} \hlkwc{columns}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"SYMBOL"}\hlstd{,} \hlstr{"GOALL"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# 'select()' returned 1:many mapping between keys and columns}}\begin{alltt}
+\hlkwd{head}\hlstd{(entrezsUp2GO)}
+\end{alltt}
+\end{kframe}
+
+
+\begin{tabular}{l|l|l|l|l}
+\hline
+ENTREZID & SYMBOL & GOALL & EVIDENCEALL & ONTOLOGYALL\\
+\hline
+51442 & VGLL1 & GO:0000988 & TAS & MF\\
+\hline
+51442 & VGLL1 & GO:0000989 & TAS & MF\\
+\hline
+51442 & VGLL1 & GO:0003674 & IEA & MF\\
+\hline
+51442 & VGLL1 & GO:0003674 & TAS & MF\\
+\hline
+51442 & VGLL1 & GO:0003712 & TAS & MF\\
+\hline
+51442 & VGLL1 & GO:0003713 & TAS & MF\\
+\hline
+\end{tabular}\begin{kframe}\begin{alltt}
+\hlstd{entrezsUp2GOBP}\hlkwb{<-} \hlstd{entrezsUp2GO[entrezsUp2GO}\hlopt{$}\hlstd{ONTOLOGY}\hlopt{==}\hlstr{"BP"}\hlstd{,]}
+\hlstd{BPprofileWithGenes}\hlkwb{<-} \hlkwd{cbind}\hlstd{(BPprofile1,} \hlkwc{genes}\hlstd{=}\hlkwd{rep}\hlstd{(}\hlstr{""}\hlstd{,} \hlkwd{nrow}\hlstd{(BPprofile1)))}
+\hlstd{BPprofileWithGenes}\hlopt{$}\hlstd{genes}\hlkwb{<-} \hlkwd{as.character}\hlstd{(BPprofileWithGenes}\hlopt{$}\hlstd{genes)}
+\hlkwa{for} \hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlkwd{nrow}\hlstd{(BPprofile1))\{}
+  \hlstd{GOIDi}\hlkwb{<-} \hlstd{BPprofile1[i,}\hlstr{"GOID"}\hlstd{]}
+  \hlstd{genesi} \hlkwb{<-}\hlkwd{unique}\hlstd{(entrezsUp2GOBP[entrezsUp2GOBP}\hlopt{$}\hlstd{GO}\hlopt{==}\hlstd{GOIDi,}\hlstr{"ENTREZID"}\hlstd{])}
+  \hlstd{genesi} \hlkwb{<-} \hlkwd{paste}\hlstd{(genesi[}\hlopt{!}\hlkwd{is.na}\hlstd{(genesi)],} \hlkwc{collapse} \hlstd{=} \hlstr{" "}\hlstd{)}
+  \hlstd{BPprofileWithGenes[i,}\hlstr{"genes"}\hlstd{]}\hlkwb{=}\hlstd{genesi}
+\hlstd{\}}
+\hlkwd{head}\hlstd{(BPprofileWithGenes)}
+\end{alltt}
+\end{kframe}
+
+
+\begin{tabular}{l|l|l|r|l}
+\hline
+  & Description & GOID & Frequency & genes\\
+\hline
+6 & behavior & GO:0007610 & 11 & 3251 2744 6566 6722 2019 51083 3815 5743 89797 2534 3569 5270\\
+\hline
+9 & biological adhesion & GO:0022610 & 44 & 5613 1029 2824 30968 55082 9655 6347 4851 11326 8428 6722 23189 57162 56603 5317 4277 6624 3815 6194 10892 11151 10125 5411 10855 5771 4478 6711 6777 5054 1326 2534 1230 4690 8874 4067 5578 9133 3569 5062 5270 965 9473 79679 9045\\
+\hline
+15 & biological phase & GO:0044848 & 1 & 51083\\
+\hline
+23 & biological regulation & GO:0065007 & 265 & 51442 2568 11168 5613 1029 3251 10644 2744 81611 467 6566 2824 113 51444 7447 4281 3843 7298 4609 53335 9126 30968 4603 4893 55082 9655 663 9459 23228 9493 6347 28959 2773 5359 5268 4200 9833 55795 7153 4851 7027 858 2961 3832 6001 51765 6663 146909 11326 2123 10099 8428 6722 55872 10000 23643 10950 80306 10591 8842 1116 65109 9444 23189 9181 5321 6619 10477 2019 699 10449 57162 231 9232 10149 10659 51083 929 10133 10479 56603 5317 7272 2296 114885 2263 6275 23432 2305 4277 10492 9994 2332 5366 54881 55013 5213 4751 9446 597 5066 55704 6624 7342 10635 26278 6197 10915 8660 3815 6194 5520 55144 64425 10892 55120 8881 29899 5806 11151 10125 84079 26577 5411 6355 8685 86 7913 8898 22873 9839 10123 5202 57180 1871 6907 3709 10855 29969 10670 26098 403 5771 10289 5743 2213 9925 8936 10308 8877 6374 5585 3868 5134 4478 1808 64783 1514 4311 64699 123 1063 7096 6711 55365 55055 5984 55816 89797 3455 10966 3759 6777 6877 5054 1326 2001 834 1381 65110 10602 51053 5996 7159 51320 5610 5292 23390 9467 2534 9910 4089 701 259266 4332 1230 2212 4690 8874 2210 2869 573 4259 54962 6742 9656 10542 54861 79001 4067 54210 2146 5578 10054 440 366 119 9933 10346 9133 1756 8477 3925 3569 4436 6398 9103 85453 6840 23683 10209 56647 5062 56652 3837 23076 9702 6277 5270 2619 5650 2769 965 56950 9473 11097 79679 996 10403 29978 8795 23347 991 3298 56983 5329 55012 1535 1054 374354 10404 54780 2919 23516 7775\\
+\hline
+3 & cell killing & GO:0001906 & 6 & 6347 4277 11151 10125 6777 54210 1054\\
+\hline
+24 & cellular component organization or biogenesis & GO:0071840 & 165 & 11168 1029 3251 2744 81611 23708 6566 2824 3854 4281 3843 4609 84617 9126 30968 4893 2037 9459 6632 9493 6347 2773 5359 5268 55795 7153 4851 7027 858 10426 3832 51765 146909 8428 6722 55872 10000 10591 23189 9181 2182 699 10449 1730 9232 51083 929 10133 10479 56603 6443 5317 54908 7272 2296 2091 2263 4155 10112 2332 5366 54881 5213 4751 597 5066 55704 6624 9837 26278 6197 2012 3815 6194 5520 64425 10892 8881 29899 5806 11151 10125 84079 86 7913 8898 22873 10885 9839 5202 57180 6907 56992 2189 10855 403 27042 8936 8877 5585 3868 4478 1808 1514 1063 6711 55055 5984 3759 6877 5054 10602 51053 10484 23336 7159 5610 29078 2534 9910 4089 701 259266 4690 8874 57405 54962 6742 10542 64151 4067 2146 5578 366 119 6201 10346 9133 1756 8477 3925 3569 4436 85453 6840 5062 56652 3837 23076 9702 6277 5270 5650 56950 11097 996 10403 29978 23347 991 5329 55012 9045 1535 2919\\
+\hline
+\end{tabular}
+\end{knitrout}
+
+
+
+
+\end{document}

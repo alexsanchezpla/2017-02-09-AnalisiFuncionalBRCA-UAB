@@ -2,7 +2,7 @@
 source("http://bioconductor.org/biocLite.R")
 if (!(require(annotate))) biocLite("annotate")
 if (!(require(GOstats))) biocLite("GOstats")
-if (!(require(org.Mm.eg.db))) biocLite("org.Mm.eg.db")
+if (!(require(org.Hs.eg.db))) biocLite("org.Hs.eg.db")
 # Data
 ## Read data
 topTab <- read.table("https://raw.githubusercontent.com/alexsanchezpla/scripts/master/Exemple_Analisis_BioC/results/ExpressAndTop_AvsB.csv2",
