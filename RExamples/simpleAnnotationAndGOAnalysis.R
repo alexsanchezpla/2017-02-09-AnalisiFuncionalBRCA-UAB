@@ -1,7 +1,7 @@
 ## ----options, include=FALSE----------------------------------------------
 if(!require(knitr)) install.packages("knitr")
 require(knitr)
-opts_chunk$set(fig.path = 'images/grafic', tidy = FALSE, cache = FALSE, message = TRUE, echo = TRUE, print = TRUE) 
+opts_chunk$set(fig.path = 'images/grafic', tidy = FALSE, cache = FALSE)
 options(width=80, warn=0, digits=4)
 options(scipen=100)
 options(java.parameters = "-Xmx4g" )
@@ -29,30 +29,14 @@ installBiocifnot("org.Hs.eg.db")
 installBiocifnot("hgu133a.db")
 installBiocifnot("biomaRt")
 
-## ----printr, eval=FALSE--------------------------------------------------
-## if(!(require(printr))) {
-##   install.packages(
-##     'printr',
-##     type = 'source',
-##     repos = c('http://yihui.name/xran', 'http://cran.rstudio.com')
-##   )
-## }
-
 ## ----getGenes------------------------------------------------------------
-topTab <- read.table("https://raw.githubusercontent.com/alexsanchezpla/scripts/master/Exemple_Analisis_BioC/results/ExpressAndTop_AvsB.csv2", head=TRUE, sep=";", dec=",", row.names = 1)
+topTab <- read.table("https://raw.githubusercontent.com/alexsanchezpla/Ejemplo_de_MDA_con_Bioconductor/master/results/ExpressAndTop_AvsB.csv2", head=TRUE, sep=";", dec=",", row.names = 1)
 colnames(topTab)
 head(topTab)
 
-## ----setProxy------------------------------------------------------------
-atVHIR <- FALSE
-if (atVHIR){
-    http_proxy="http://conf_www.ir.vhebron.net:8080/"
-    https_proxy="http://conf_www.ir.vhebron.net:8080/"
-    }
-
 ## ----annotateFromArrayPackage--------------------------------------------
 probeIDsAll <- rownames(topTab)
-probeIDsUp <- probeIDsAll [topTab$adj.P.Val<0.05 & topTab$logFC > 0] 
+probeIDsUp <- probeIDsAll [topTab$adj.P.Val<0.05 & topTab$logFC > 0]
 probeIDsDown <- probeIDsAll [topTab$adj.P.Val<0.05 & topTab$logFC < 0]
 
 require(hgu133a.db)
@@ -82,7 +66,7 @@ myentrezAtribut <- entrezAtribut[2,1]
 myentrezAtribut
 
 # Now we can do the search
-entrezfromProbesUp <- getBM(filters= myu133aFilter, 
+entrezfromProbesUp <- getBM(filters= myu133aFilter,
                           attributes= c(myentrezAtribut, myu133aFilter),
                           values= probeIDsUp,
                           mart= biodataset,uniqueRows=TRUE)
@@ -95,9 +79,12 @@ geneListDown <- topTab$EntrezsA [topTab$adj.P.Val<0.05 & topTab$logFC < 0]
 length(geneListDown)
 geneUniverse <- topTab$EntrezsA
 length(geneUniverse)
-write.csv(geneListUp, file="selectedAvsB.up.csv")
-write.csv(geneListDown, file="selectedAvsB.down.csv")
-write.csv(geneUniverse, file="geneUniverse.csv")
+writeGeneLists<- FALSE
+if(writeGeneLists){
+  write.csv(geneListUp, file="selectedAvsB.up.csv")
+  write.csv(geneListDown, file="selectedAvsB.down.csv")
+  write.csv(geneUniverse, file="geneUniverse.csv")
+}
 
 ## ----prepareEntrezs------------------------------------------------------
 # Remove potential NA's values
@@ -116,7 +103,7 @@ GOparams = new("GOHyperGParams",
                testDirection="over")
 KEGGparams = new("KEGGHyperGParams",
                  geneIds=geneEntrezsUp, universeGeneIds=geneEntrezsUniverse,
-                 annotation="org.Hs.eg.db", # might have use hgu133a.db instead 
+                 annotation="org.Hs.eg.db", # might have use hgu133a.db instead
                  pvalueCutoff=0.01, testDirection="over")
 
 ## ----GOAnalysis2---------------------------------------------------------
@@ -133,4 +120,25 @@ GOfilename =file.path(paste("GOResults.AvsB.up",".html", sep=""))
 KEGGfilename =file.path(paste("KEGGResults.AvsB.up",".html", sep=""))
 htmlReport(GOhyper, file = GOfilename, summary.args=list("htmlLinks"=TRUE))
 htmlReport(KEGGhyper, file = KEGGfilename, summary.args=list("htmlLinks"=TRUE))
+
+## ----goProfiles1---------------------------------------------------------
+require(goProfiles)
+BPprofile1<- basicProfile(genelist=geneListUp, onto="BP", orgPackage="org.Hs.eg.db", empty.cats=FALSE, level=2)[[1]]
+head(BPprofile1)
+
+## ----GOANots-------------------------------------------------------------
+require(org.Hs.eg.db)
+keytypes(org.Hs.eg.db)
+entrezsUp2GO <- select(org.Hs.eg.db, keys = as.character(geneListUp), columns=c("SYMBOL", "GOALL"))
+head(entrezsUp2GO)
+entrezsUp2GOBP<- entrezsUp2GO[entrezsUp2GO$ONTOLOGY=="BP",]
+BPprofileWithGenes<- cbind(BPprofile1, genes=rep("", nrow(BPprofile1)))
+BPprofileWithGenes$genes<- as.character(BPprofileWithGenes$genes)
+for (i in 1:nrow(BPprofile1)){
+  GOIDi<- BPprofile1[i,"GOID"]
+  genesi <-unique(entrezsUp2GOBP[entrezsUp2GOBP$GO==GOIDi,"ENTREZID"])
+  genesi <- paste(genesi[!is.na(genesi)], collapse = " ")
+  BPprofileWithGenes[i,"genes"]=genesi
+}
+head(BPprofileWithGenes)
 
