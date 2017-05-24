@@ -52,16 +52,6 @@ installBiocifnot("hgu133a.db")
 installBiocifnot("biomaRt")
 @
 
-<<printr, eval=FALSE>>=
-if(!(require(printr))) {
-  install.packages(
-    'printr',
-    type = 'source',
-    repos = c('http://yihui.name/xran', 'http://cran.rstudio.com')
-  )
-}
-@
-
 
 \section{Introduction}
 
@@ -86,7 +76,7 @@ The first step in annotation analysis is to obtain the gene lists,
 usually as the output of some differential expression analysis.
 
 <<getGenes>>=
-topTab <- read.table("https://raw.githubusercontent.com/alexsanchezpla/scripts/master/Exemple_Analisis_BioC/results/ExpressAndTop_AvsB.csv2", head=TRUE, sep=";", dec=",", row.names = 1)
+topTab <- read.table("https://raw.githubusercontent.com/alexsanchezpla/Ejemplo_de_MDA_con_Bioconductor/master/results/ExpressAndTop_AvsB.csv2", head=TRUE, sep=";", dec=",", row.names = 1)
 colnames(topTab)
 head(topTab)
 @
@@ -99,14 +89,6 @@ it hadn't been}?
 
 We might have used either a specific annotation package for the array
 or the BioMaRt package.
-
-<<setProxy>>=
-atVHIR <- TRUE
-if (atVHIR){
-    http_proxy="http://conf_www.ir.vhebron.net:8080/"
-    https_proxy="http://conf_www.ir.vhebron.net:8080/"
-    }
-@
 
 \subsection{Using a microarray annotation package}
 

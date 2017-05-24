@@ -72,20 +72,6 @@
 
 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwa{if}\hlstd{(}\hlopt{!}\hlstd{(}\hlkwd{require}\hlstd{(printr))) \{}
-  \hlkwd{install.packages}\hlstd{(}
-    \hlstr{'printr'}\hlstd{,}
-    \hlkwc{type} \hlstd{=} \hlstr{'source'}\hlstd{,}
-    \hlkwc{repos} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'http://yihui.name/xran'}\hlstd{,} \hlstr{'http://cran.rstudio.com'}\hlstd{)}
-  \hlstd{)}
-\hlstd{\}}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
 
 \section{Introduction}
 
@@ -112,37 +98,49 @@ usually as the output of some differential expression analysis.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlstd{topTab} \hlkwb{<-} \hlkwd{read.table}\hlstd{(}\hlstr{"https://raw.githubusercontent.com/alexsanchezpla/scripts/master/Exemple_Analisis_BioC/results/ExpressAndTop_AvsB.csv2"}\hlstd{,} \hlkwc{head}\hlstd{=}\hlnum{TRUE}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{";"}\hlstd{,} \hlkwc{dec}\hlstd{=}\hlstr{","}\hlstd{,} \hlkwc{row.names} \hlstd{=} \hlnum{1}\hlstd{)}
+\hlstd{topTab} \hlkwb{<-} \hlkwd{read.table}\hlstd{(}\hlstr{"https://raw.githubusercontent.com/alexsanchezpla/Ejemplo_de_MDA_con_Bioconductor/master/results/ExpressAndTop_AvsB.csv2"}\hlstd{,} \hlkwc{head}\hlstd{=}\hlnum{TRUE}\hlstd{,} \hlkwc{sep}\hlstd{=}\hlstr{";"}\hlstd{,} \hlkwc{dec}\hlstd{=}\hlstr{","}\hlstd{,} \hlkwc{row.names} \hlstd{=} \hlnum{1}\hlstd{)}
 \hlkwd{colnames}\hlstd{(topTab)}
 \end{alltt}
 \begin{verbatim}
-##  [1] "SymbolsA"  "EntrezsA"  "logFC"     "AveExpr"   "t"         "P.Value"  
-##  [7] "adj.P.Val" "B"         "A.PF14"    "A.PF19"    "A.PF23"    "A.PF39"   
-## [13] "A.PF46"    "B.PF24"    "B.PF25"    "B.PF28"    "B.PF34"    "B.PF42"
+##  [1] "SymbolsA"     "EntrezsA"     "logFC"        "AveExpr"      "t"           
+##  [6] "P.Value"      "adj.P.Val"    "B"            "GSM26878.CEL" "GSM26883.CEL"
+## [11] "GSM26887.CEL" "GSM26903.CEL" "GSM26910.CEL" "GSM26888.CEL" "GSM26889.CEL"
+## [16] "GSM26892.CEL" "GSM26898.CEL" "GSM26906.CEL"
 \end{verbatim}
 \begin{alltt}
 \hlkwd{head}\hlstd{(topTab)}
 \end{alltt}
+\begin{verbatim}
+##             SymbolsA EntrezsA  logFC AveExpr       t          P.Value
+## 204667_at      FOXA1     3169 -3.038   8.651 -14.362 0.00000000005742
+## 215729_s_at    VGLL1    51442  3.452   6.138  12.815 0.00000000034385
+## 220192_x_at    SPDEF    25803 -3.016   9.522 -10.859 0.00000000433617
+## 214451_at     TFAP2B     7021 -5.665   7.433 -10.830 0.00000000451614
+## 217528_at      CLCA2     9635 -5.622   6.763  -9.666 0.00000002429965
+## 217284_x_at   SERHL2   253190 -4.313   9.133  -9.528 0.00000002994504
+##               adj.P.Val      B GSM26878.CEL GSM26883.CEL GSM26887.CEL
+## 204667_at   0.000000357 14.650        9.822        9.514        9.919
+## 215729_s_at 0.000001069 13.150        4.737        4.761        6.255
+## 220192_x_at 0.000007020 10.929       10.484       10.915       10.511
+## 214451_at   0.000007020 10.893       10.177       10.060       11.201
+## 217528_at   0.000030219  9.364       10.534       10.036       11.326
+## 217284_x_at 0.000031033  9.172       11.727        9.741       11.436
+##             GSM26903.CEL GSM26910.CEL GSM26888.CEL GSM26889.CEL GSM26892.CEL
+## 204667_at          9.601        9.592        6.484        6.551        7.001
+## 215729_s_at        4.820        4.848        8.266        8.963        8.304
+## 220192_x_at       11.510       10.265        7.824        7.810        7.522
+## 214451_at         10.889       10.404        4.818        4.784        4.976
+## 217528_at          8.053       10.619        4.581        4.538        4.519
+## 217284_x_at       12.819       12.687        7.274        7.298        7.491
+##             GSM26898.CEL GSM26906.CEL
+## 204667_at          6.685        6.535
+## 215729_s_at        8.769        8.381
+## 220192_x_at        8.427        7.020
+## 214451_at          4.912        4.916
+## 217528_at          4.357        4.463
+## 217284_x_at        7.562        7.217
+\end{verbatim}
 \end{kframe}
-
-
-\begin{tabular}{l|l|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r}
-\hline
-  & SymbolsA & EntrezsA & logFC & AveExpr & t & P.Value & adj.P.Val & B & A.PF14 & A.PF19 & A.PF23 & A.PF39 & A.PF46 & B.PF24 & B.PF25 & B.PF28 & B.PF34 & B.PF42\\
-\hline
-204667\_at & FOXA1 & 3169 & -3.038 & 8.651 & -14.362 & 0 & 0 & 14.649 & 9.822 & 9.514 & 9.919 & 9.601 & 9.592 & 6.484 & 6.551 & 7.001 & 6.685 & 6.535\\
-\hline
-215729\_s\_at & VGLL1 & 51442 & 3.452 & 6.138 & 12.815 & 0 & 0 & 13.149 & 4.737 & 4.761 & 6.255 & 4.820 & 4.848 & 8.266 & 8.963 & 8.304 & 8.769 & 8.381\\
-\hline
-220192\_x\_at & SPDEF & 25803 & -3.016 & 9.522 & -10.859 & 0 & 0 & 10.928 & 10.484 & 10.915 & 10.511 & 11.510 & 10.265 & 7.824 & 7.810 & 7.522 & 8.427 & 7.020\\
-\hline
-214451\_at & TFAP2B & 7021 & -5.665 & 7.433 & -10.829 & 0 & 0 & 10.892 & 10.177 & 10.060 & 11.201 & 10.889 & 10.404 & 4.818 & 4.784 & 4.976 & 4.912 & 4.916\\
-\hline
-217528\_at & CLCA2 & 9635 & -5.622 & 6.763 & -9.666 & 0 & 0 & 9.363 & 10.534 & 10.036 & 11.326 & 8.053 & 10.619 & 4.581 & 4.538 & 4.519 & 4.357 & 4.463\\
-\hline
-217284\_x\_at & SERHL2 & 253190 & -4.313 & 9.133 & -9.528 & 0 & 0 & 9.171 & 11.727 & 9.741 & 11.436 & 12.819 & 12.687 & 7.274 & 7.298 & 7.490 & 7.562 & 7.218\\
-\hline
-\end{tabular}
 \end{knitrout}
 
 \section{Annotating the genes}
@@ -153,18 +151,6 @@ it hadn't been}?
 
 We might have used either a specific annotation package for the array
 or the BioMaRt package.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{atVHIR} \hlkwb{<-} \hlnum{TRUE}
-\hlkwa{if} \hlstd{(atVHIR)\{}
-    \hlstd{http_proxy}\hlkwb{=}\hlstr{"http://conf_www.ir.vhebron.net:8080/"}
-    \hlstd{https_proxy}\hlkwb{=}\hlstr{"http://conf_www.ir.vhebron.net:8080/"}
-    \hlstd{\}}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
 
 \subsection{Using a microarray annotation package}
 
@@ -206,26 +192,16 @@ If we hadn't had 'Entrez' Identifiers, but only the probeset identifiers which d
 {\ttfamily\noindent\itshape\color{messagecolor}{\#\# 'select()' returned 1:1 mapping between keys and columns}}\begin{alltt}
 \hlkwd{head}\hlstd{(geneEntrezsUp)}
 \end{alltt}
+\begin{verbatim}
+##       PROBEID ENTREZID SYMBOL
+## 1 215729_s_at    51442  VGLL1
+## 2   205044_at     2568  GABRP
+## 3   209337_at    11168  PSIP1
+## 4   209786_at    10473  HMGN4
+## 5   204061_at     5613   PRKX
+## 6   207039_at     1029 CDKN2A
+\end{verbatim}
 \end{kframe}
-
-
-\begin{tabular}{l|l|l}
-\hline
-PROBEID & ENTREZID & SYMBOL\\
-\hline
-215729\_s\_at & 51442 & VGLL1\\
-\hline
-205044\_at & 2568 & GABRP\\
-\hline
-209337\_at & 11168 & PSIP1\\
-\hline
-209786\_at & 10473 & HMGN4\\
-\hline
-204061\_at & 5613 & PRKX\\
-\hline
-207039\_at & 1029 & CDKN2A\\
-\hline
-\end{tabular}
 \end{knitrout}
 
 \subsection{Using BiomaRt}
@@ -237,83 +213,84 @@ It is a bit cryptic at the first approach because in order to use it we must def
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{biodataset} \hlkwb{<-} \hlkwd{useDataset}\hlstd{(}\hlstr{"hsapiens_gene_ensembl"}\hlstd{,} \hlkwd{useMart}\hlstd{(}\hlstr{"ensembl"}\hlstd{))}
-\end{alltt}
-\begin{verbatim}
-## Request to BioMart web service failed. Verify if you are still connected to the internet.  Alternatively the BioMart web service is temporarily down.  Check http://www.biomart.org and verify if this website is available.
-\end{verbatim}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: XML content does not seem to be XML:}}\begin{alltt}
 \hlkwd{listDatasets}\hlstd{(biodataset)}\hlopt{$}\hlstd{dataset}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is(mart, "{}Mart"{}): object 'biodataset' not found}}\begin{alltt}
+\begin{verbatim}
+##  [1] "ggorilla_gene_ensembl"          "oanatinus_gene_ensembl"        
+##  [3] "mgallopavo_gene_ensembl"        "meugenii_gene_ensembl"         
+##  [5] "lafricana_gene_ensembl"         "dnovemcinctus_gene_ensembl"    
+##  [7] "etelfairi_gene_ensembl"         "nleucogenys_gene_ensembl"      
+##  [9] "psinensis_gene_ensembl"         "tguttata_gene_ensembl"         
+## [11] "btaurus_gene_ensembl"           "trubripes_gene_ensembl"        
+## [13] "csabaeus_gene_ensembl"          "olatipes_gene_ensembl"         
+## [15] "mmulatta_gene_ensembl"          "cintestinalis_gene_ensembl"    
+## [17] "eeuropaeus_gene_ensembl"        "ocuniculus_gene_ensembl"       
+## [19] "xmaculatus_gene_ensembl"        "dmelanogaster_gene_ensembl"    
+## [21] "ecaballus_gene_ensembl"         "tbelangeri_gene_ensembl"       
+## [23] "gmorhua_gene_ensembl"           "sscrofa_gene_ensembl"          
+## [25] "lchalumnae_gene_ensembl"        "hsapiens_gene_ensembl"         
+## [27] "cjacchus_gene_ensembl"          "mfuro_gene_ensembl"            
+## [29] "csavignyi_gene_ensembl"         "cfamiliaris_gene_ensembl"      
+## [31] "celegans_gene_ensembl"          "oniloticus_gene_ensembl"       
+## [33] "rnorvegicus_gene_ensembl"       "pabelii_gene_ensembl"          
+## [35] "tsyrichta_gene_ensembl"         "oprinceps_gene_ensembl"        
+## [37] "pvampyrus_gene_ensembl"         "amelanoleuca_gene_ensembl"     
+## [39] "aplatyrhynchos_gene_ensembl"    "gaculeatus_gene_ensembl"       
+## [41] "pcapensis_gene_ensembl"         "falbicollis_gene_ensembl"      
+## [43] "amexicanus_gene_ensembl"        "tnigroviridis_gene_ensembl"    
+## [45] "choffmanni_gene_ensembl"        "ptroglodytes_gene_ensembl"     
+## [47] "xtropicalis_gene_ensembl"       "ogarnettii_gene_ensembl"       
+## [49] "scerevisiae_gene_ensembl"       "cporcellus_gene_ensembl"       
+## [51] "acarolinensis_gene_ensembl"     "ggallus_gene_ensembl"          
+## [53] "pmarinus_gene_ensembl"          "mmurinus_gene_ensembl"         
+## [55] "mlucifugus_gene_ensembl"        "fcatus_gene_ensembl"           
+## [57] "dordii_gene_ensembl"            "sharrisii_gene_ensembl"        
+## [59] "itridecemlineatus_gene_ensembl" "mdomestica_gene_ensembl"       
+## [61] "drerio_gene_ensembl"            "mmusculus_gene_ensembl"        
+## [63] "ttruncatus_gene_ensembl"        "saraneus_gene_ensembl"         
+## [65] "loculatus_gene_ensembl"         "oaries_gene_ensembl"           
+## [67] "pformosa_gene_ensembl"          "vpacos_gene_ensembl"           
+## [69] "panubis_gene_ensembl"
+\end{verbatim}
+\begin{alltt}
 \hlstd{filters}\hlkwb{<-}\hlkwd{listFilters}\hlstd{(biodataset)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in martCheck(mart): object 'biodataset' not found}}\begin{alltt}
 \hlcom{# We need to find the filter to link with Affymetrx arrays hgu133a}
 \hlstd{u133aFilters}\hlkwb{<-} \hlkwd{grep}\hlstd{(}\hlstr{"u133a"}\hlstd{, filters[,}\hlnum{1}\hlstd{] )}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in grep("{}u133a"{}, filters[, 1]): object 'filters' not found}}\begin{alltt}
 \hlstd{u133aFilters} \hlkwb{<-} \hlstd{filters[u133aFilters,]}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'filters' not found}}\begin{alltt}
 \hlstd{myu133aFilter} \hlkwb{<-} \hlstd{u133aFilters[}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{]}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'u133aFilters' not found}}\begin{alltt}
 \hlstd{myu133aFilter}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'myu133aFilter' not found}}\begin{alltt}
+\begin{verbatim}
+## [1] "affy_hg_u133a"
+\end{verbatim}
+\begin{alltt}
 \hlstd{atributs}\hlkwb{<-} \hlkwd{listAttributes}\hlstd{(biodataset)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in martCheck(mart): object 'biodataset' not found}}\begin{alltt}
 \hlstd{entrezAtributs}\hlkwb{<-} \hlkwd{grep}\hlstd{(}\hlstr{"entrez"}\hlstd{, atributs[,}\hlnum{1}\hlstd{])}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in grep("{}entrez"{}, atributs[, 1]): object 'atributs' not found}}\begin{alltt}
 \hlstd{entrezAtribut} \hlkwb{<-} \hlstd{atributs[entrezAtributs,]}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'atributs' not found}}\begin{alltt}
 \hlstd{myentrezAtribut} \hlkwb{<-} \hlstd{entrezAtribut[}\hlnum{2}\hlstd{,}\hlnum{1}\hlstd{]}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'entrezAtribut' not found}}\begin{alltt}
 \hlstd{myentrezAtribut}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'myentrezAtribut' not found}}\begin{alltt}
+\begin{verbatim}
+## [1] "entrezgene"
+\end{verbatim}
+\begin{alltt}
 \hlcom{# Now we can do the search}
 \hlstd{entrezfromProbesUp} \hlkwb{<-} \hlkwd{getBM}\hlstd{(}\hlkwc{filters}\hlstd{= myu133aFilter,}
                           \hlkwc{attributes}\hlstd{=} \hlkwd{c}\hlstd{(myentrezAtribut, myu133aFilter),}
                           \hlkwc{values}\hlstd{= probeIDsUp,}
                           \hlkwc{mart}\hlstd{= biodataset,}\hlkwc{uniqueRows}\hlstd{=}\hlnum{TRUE}\hlstd{)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in martCheck(mart): object 'biodataset' not found}}\begin{alltt}
 \hlkwd{head}\hlstd{(entrezfromProbesUp)}
 \end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in head(entrezfromProbesUp): object 'entrezfromProbesUp' not found}}\end{kframe}
+\begin{verbatim}
+##   entrezgene affy_hg_u133a
+## 1       6201   200082_s_at
+## 2      54881     218104_at
+## 3      10054   201177_s_at
+## 4         NA   214511_x_at
+## 5      23231     212314_at
+## 6       2869   204396_s_at
+\end{verbatim}
+\end{kframe}
 \end{knitrout}
 
 \subsection{The gene list for pathway Analysis}
@@ -343,7 +320,7 @@ Although we skip it here it may be interesting to compare the entrez identifiers
 \hlkwd{length}\hlstd{(geneUniverse)}
 \end{alltt}
 \begin{verbatim}
-## [1] 6221
+## [1] 6218
 \end{verbatim}
 \begin{alltt}
 \hlstd{writeGeneLists}\hlkwb{<-} \hlnum{FALSE}
@@ -414,12 +391,12 @@ Next we use them to do the enrichment analysis
 \end{alltt}
 \begin{verbatim}
 ##       GOBPID       Pvalue OddsRatio ExpCount Count Size
-## 1 GO:0000278 0.0000008665     2.209    30.65    58  524
-## 2 GO:0007049 0.0000038238     1.897    48.67    79  832
-## 3 GO:0007067 0.0000080651     2.720    12.75    30  218
-## 4 GO:0000280 0.0000126635     2.518    15.03    33  257
-## 5 GO:0051301 0.0000413601     2.354    15.91    33  272
-## 6 GO:0008283 0.0000438041     1.741    52.77    80  902
+## 1 GO:0000278 0.0000008172     2.214    30.60    58  523
+## 2 GO:0007049 0.0000036709     1.899    48.62    79  831
+## 3 GO:0007067 0.0000080923     2.719    12.76    30  218
+## 4 GO:0000280 0.0000127084     2.518    15.04    33  257
+## 5 GO:0051301 0.0000415008     2.353    15.91    33  272
+## 6 GO:0008283 0.0000440735     1.740    52.78    80  902
 ##                       Term
 ## 1       mitotic cell cycle
 ## 2               cell cycle
@@ -437,7 +414,9 @@ Next we use them to do the enrichment analysis
 \begin{alltt}
 \hlkwd{print}\hlstd{(}\hlkwd{head}\hlstd{(}\hlkwd{summary}\hlstd{(KEGGhyper)))}
 \end{alltt}
-\begin{verbatim}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# KEGG.db contains mappings based on older data because the original\\\#\#\ \  resource was removed from the the public domain before the most\\\#\#\ \  recent update was produced. This package should now be considered\\\#\#\ \  deprecated and future versions of Bioconductor may not have it\\\#\#\ \  available.\ \ Users who want more current data are encouraged to look\\\#\#\ \  at the KEGGREST or reactome.db packages}}\begin{verbatim}
 ##   KEGGID   Pvalue OddsRatio ExpCount Count Size
 ## 1  04110 0.001294     2.878    5.724    14   89
 ## 2  04114 0.002082     3.167    4.116    11   64
@@ -478,29 +457,23 @@ The \texttt{goProfiles} package provides a different approach to Pathway Analysi
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlkwd{require}\hlstd{(goProfiles)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: goProfiles}}\begin{alltt}
 \hlstd{BPprofile1}\hlkwb{<-} \hlkwd{basicProfile}\hlstd{(}\hlkwc{genelist}\hlstd{=geneListUp,} \hlkwc{onto}\hlstd{=}\hlstr{"BP"}\hlstd{,} \hlkwc{orgPackage}\hlstd{=}\hlstr{"org.Hs.eg.db"}\hlstd{,} \hlkwc{empty.cats}\hlstd{=}\hlnum{FALSE}\hlstd{,} \hlkwc{level}\hlstd{=}\hlnum{2}\hlstd{)[[}\hlnum{1}\hlstd{]]}
 \hlkwd{head}\hlstd{(BPprofile1)}
 \end{alltt}
+\begin{verbatim}
+##                                      Description       GOID Frequency
+## 6                                       behavior GO:0007610        11
+## 9                            biological adhesion GO:0022610        44
+## 15                              biological phase GO:0044848         1
+## 23                         biological regulation GO:0065007       265
+## 3                                   cell killing GO:0001906         6
+## 24 cellular component organization or biogenesis GO:0071840       165
+\end{verbatim}
 \end{kframe}
-
-
-\begin{tabular}{l|l|l|r}
-\hline
-  & Description & GOID & Frequency\\
-\hline
-6 & behavior & GO:0007610 & 11\\
-\hline
-9 & biological adhesion & GO:0022610 & 44\\
-\hline
-15 & biological phase & GO:0044848 & 1\\
-\hline
-23 & biological regulation & GO:0065007 & 265\\
-\hline
-3 & cell killing & GO:0001906 & 6\\
-\hline
-24 & cellular component organization or biogenesis & GO:0071840 & 165\\
-\hline
-\end{tabular}
 \end{knitrout}
 
 Now we might want to annotate the GO categories with their genes.
@@ -528,26 +501,16 @@ First we look the reverse, which GO terms are associated with each gene in the l
 {\ttfamily\noindent\itshape\color{messagecolor}{\#\# 'select()' returned 1:many mapping between keys and columns}}\begin{alltt}
 \hlkwd{head}\hlstd{(entrezsUp2GO)}
 \end{alltt}
-\end{kframe}
-
-
-\begin{tabular}{l|l|l|l|l}
-\hline
-ENTREZID & SYMBOL & GOALL & EVIDENCEALL & ONTOLOGYALL\\
-\hline
-51442 & VGLL1 & GO:0000988 & TAS & MF\\
-\hline
-51442 & VGLL1 & GO:0000989 & TAS & MF\\
-\hline
-51442 & VGLL1 & GO:0003674 & IEA & MF\\
-\hline
-51442 & VGLL1 & GO:0003674 & TAS & MF\\
-\hline
-51442 & VGLL1 & GO:0003712 & TAS & MF\\
-\hline
-51442 & VGLL1 & GO:0003713 & TAS & MF\\
-\hline
-\end{tabular}\begin{kframe}\begin{alltt}
+\begin{verbatim}
+##   ENTREZID SYMBOL      GOALL EVIDENCEALL ONTOLOGYALL
+## 1    51442  VGLL1 GO:0000988         TAS          MF
+## 2    51442  VGLL1 GO:0000989         TAS          MF
+## 3    51442  VGLL1 GO:0003674         IEA          MF
+## 4    51442  VGLL1 GO:0003674         TAS          MF
+## 5    51442  VGLL1 GO:0003712         TAS          MF
+## 6    51442  VGLL1 GO:0003713         TAS          MF
+\end{verbatim}
+\begin{alltt}
 \hlstd{entrezsUp2GOBP}\hlkwb{<-} \hlstd{entrezsUp2GO[entrezsUp2GO}\hlopt{$}\hlstd{ONTOLOGY}\hlopt{==}\hlstr{"BP"}\hlstd{,]}
 \hlstd{BPprofileWithGenes}\hlkwb{<-} \hlkwd{cbind}\hlstd{(BPprofile1,} \hlkwc{genes}\hlstd{=}\hlkwd{rep}\hlstd{(}\hlstr{""}\hlstd{,} \hlkwd{nrow}\hlstd{(BPprofile1)))}
 \hlstd{BPprofileWithGenes}\hlopt{$}\hlstd{genes}\hlkwb{<-} \hlkwd{as.character}\hlstd{(BPprofileWithGenes}\hlopt{$}\hlstd{genes)}
@@ -559,26 +522,23 @@ ENTREZID & SYMBOL & GOALL & EVIDENCEALL & ONTOLOGYALL\\
 \hlstd{\}}
 \hlkwd{head}\hlstd{(BPprofileWithGenes)}
 \end{alltt}
+\begin{verbatim}
+##                                      Description       GOID Frequency
+## 6                                       behavior GO:0007610        11
+## 9                            biological adhesion GO:0022610        44
+## 15                              biological phase GO:0044848         1
+## 23                         biological regulation GO:0065007       265
+## 3                                   cell killing GO:0001906         6
+## 24 cellular component organization or biogenesis GO:0071840       165
+##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           genes
+## 6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 3251 2744 6566 6722 2019 51083 3815 5743 89797 2534 3569 5270
+## 9                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         5613 1029 2824 30968 55082 9655 6347 4851 11326 8428 6722 23189 57162 56603 5317 4277 6624 3815 6194 10892 11151 10125 5411 10855 5771 4478 6711 6777 5054 1326 2534 1230 4690 8874 4067 5578 9133 3569 5062 5270 965 9473 79679 9045
+## 15                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        51083
+## 23 51442 2568 11168 5613 1029 3251 10644 2744 81611 467 6566 2824 113 51444 7447 4281 3843 7298 4609 53335 9126 30968 4603 4893 55082 9655 663 9459 23228 9493 6347 28959 2773 5359 5268 4200 9833 55795 7153 4851 7027 858 2961 3832 6001 51765 6663 146909 11326 2123 10099 8428 6722 55872 10000 23643 10950 80306 10591 8842 1116 65109 9444 23189 9181 5321 6619 10477 2019 699 10449 57162 231 9232 10149 10659 51083 929 10133 10479 56603 5317 7272 2296 114885 2263 6275 23432 2305 4277 10492 9994 2332 5366 54881 55013 5213 4751 9446 597 5066 55704 6624 7342 10635 26278 6197 10915 8660 3815 6194 5520 55144 64425 10892 55120 8881 29899 5806 11151 10125 84079 26577 5411 6355 8685 86 7913 8898 22873 9839 10123 5202 57180 1871 6907 3709 10855 29969 10670 26098 403 5771 10289 5743 2213 9925 8936 10308 8877 6374 5585 3868 5134 4478 1808 64783 1514 4311 64699 123 1063 7096 6711 55365 55055 5984 55816 89797 3455 10966 3759 6777 6877 5054 1326 2001 834 1381 65110 10602 51053 5996 7159 51320 5610 5292 23390 9467 2534 9910 4089 701 259266 4332 1230 2212 4690 8874 2210 2869 573 4259 54962 6742 9656 10542 54861 79001 4067 54210 2146 5578 10054 440 366 119 9933 10346 9133 1756 8477 3925 3569 4436 6398 9103 85453 6840 23683 10209 56647 5062 56652 3837 23076 9702 6277 5270 2619 5650 2769 965 56950 9473 11097 79679 996 10403 29978 8795 23347 991 3298 56983 5329 55012 1535 1054 374354 10404 54780 2919 23516 7775
+## 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         6347 4277 11151 10125 6777 54210 1054
+## 24                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       11168 1029 3251 2744 81611 23708 6566 2824 3854 4281 3843 4609 84617 9126 30968 4893 2037 9459 6632 9493 6347 2773 5359 5268 55795 7153 4851 7027 858 10426 3832 51765 146909 8428 6722 55872 10000 10591 23189 9181 2182 699 10449 1730 9232 51083 929 10133 10479 56603 6443 5317 54908 7272 2296 2091 2263 4155 10112 2332 5366 54881 5213 4751 597 5066 55704 6624 9837 26278 6197 2012 3815 6194 5520 64425 10892 8881 29899 5806 11151 10125 84079 86 7913 8898 22873 10885 9839 5202 57180 6907 56992 2189 10855 403 27042 8936 8877 5585 3868 4478 1808 1514 1063 6711 55055 5984 3759 6877 5054 10602 51053 10484 23336 7159 5610 29078 2534 9910 4089 701 259266 4690 8874 57405 54962 6742 10542 64151 4067 2146 5578 366 119 6201 10346 9133 1756 8477 3925 3569 4436 85453 6840 5062 56652 3837 23076 9702 6277 5270 5650 56950 11097 996 10403 29978 23347 991 5329 55012 9045 1535 2919
+\end{verbatim}
 \end{kframe}
-
-
-\begin{tabular}{l|l|l|r|l}
-\hline
-  & Description & GOID & Frequency & genes\\
-\hline
-6 & behavior & GO:0007610 & 11 & 3251 2744 6566 6722 2019 51083 3815 5743 89797 2534 3569 5270\\
-\hline
-9 & biological adhesion & GO:0022610 & 44 & 5613 1029 2824 30968 55082 9655 6347 4851 11326 8428 6722 23189 57162 56603 5317 4277 6624 3815 6194 10892 11151 10125 5411 10855 5771 4478 6711 6777 5054 1326 2534 1230 4690 8874 4067 5578 9133 3569 5062 5270 965 9473 79679 9045\\
-\hline
-15 & biological phase & GO:0044848 & 1 & 51083\\
-\hline
-23 & biological regulation & GO:0065007 & 265 & 51442 2568 11168 5613 1029 3251 10644 2744 81611 467 6566 2824 113 51444 7447 4281 3843 7298 4609 53335 9126 30968 4603 4893 55082 9655 663 9459 23228 9493 6347 28959 2773 5359 5268 4200 9833 55795 7153 4851 7027 858 2961 3832 6001 51765 6663 146909 11326 2123 10099 8428 6722 55872 10000 23643 10950 80306 10591 8842 1116 65109 9444 23189 9181 5321 6619 10477 2019 699 10449 57162 231 9232 10149 10659 51083 929 10133 10479 56603 5317 7272 2296 114885 2263 6275 23432 2305 4277 10492 9994 2332 5366 54881 55013 5213 4751 9446 597 5066 55704 6624 7342 10635 26278 6197 10915 8660 3815 6194 5520 55144 64425 10892 55120 8881 29899 5806 11151 10125 84079 26577 5411 6355 8685 86 7913 8898 22873 9839 10123 5202 57180 1871 6907 3709 10855 29969 10670 26098 403 5771 10289 5743 2213 9925 8936 10308 8877 6374 5585 3868 5134 4478 1808 64783 1514 4311 64699 123 1063 7096 6711 55365 55055 5984 55816 89797 3455 10966 3759 6777 6877 5054 1326 2001 834 1381 65110 10602 51053 5996 7159 51320 5610 5292 23390 9467 2534 9910 4089 701 259266 4332 1230 2212 4690 8874 2210 2869 573 4259 54962 6742 9656 10542 54861 79001 4067 54210 2146 5578 10054 440 366 119 9933 10346 9133 1756 8477 3925 3569 4436 6398 9103 85453 6840 23683 10209 56647 5062 56652 3837 23076 9702 6277 5270 2619 5650 2769 965 56950 9473 11097 79679 996 10403 29978 8795 23347 991 3298 56983 5329 55012 1535 1054 374354 10404 54780 2919 23516 7775\\
-\hline
-3 & cell killing & GO:0001906 & 6 & 6347 4277 11151 10125 6777 54210 1054\\
-\hline
-24 & cellular component organization or biogenesis & GO:0071840 & 165 & 11168 1029 3251 2744 81611 23708 6566 2824 3854 4281 3843 4609 84617 9126 30968 4893 2037 9459 6632 9493 6347 2773 5359 5268 55795 7153 4851 7027 858 10426 3832 51765 146909 8428 6722 55872 10000 10591 23189 9181 2182 699 10449 1730 9232 51083 929 10133 10479 56603 6443 5317 54908 7272 2296 2091 2263 4155 10112 2332 5366 54881 5213 4751 597 5066 55704 6624 9837 26278 6197 2012 3815 6194 5520 64425 10892 8881 29899 5806 11151 10125 84079 86 7913 8898 22873 10885 9839 5202 57180 6907 56992 2189 10855 403 27042 8936 8877 5585 3868 4478 1808 1514 1063 6711 55055 5984 3759 6877 5054 10602 51053 10484 23336 7159 5610 29078 2534 9910 4089 701 259266 4690 8874 57405 54962 6742 10542 64151 4067 2146 5578 366 119 6201 10346 9133 1756 8477 3925 3569 4436 85453 6840 5062 56652 3837 23076 9702 6277 5270 5650 56950 11097 996 10403 29978 23347 991 5329 55012 9045 1535 2919\\
-\hline
-\end{tabular}
 \end{knitrout}
 
 
